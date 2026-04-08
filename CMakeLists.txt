@@ -31,7 +31,6 @@ set(SOURCES
     src/TimelineClip.cpp
     src/MediaLibrary.cpp
     src/Project.cpp
-    src/UndoRedoManager.cpp
     src/ExportDialog.cpp
     src/EffectsPanel.cpp
     src/TextTool.cpp

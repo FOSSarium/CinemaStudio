@@ -11,6 +11,7 @@
 #include "core/ProjectFile.h"
 #include "core/Track.h"
 #include <QApplication>
+#include <QCloseEvent>
 #include <QFile>
 #include <QFileDialog>
 #include <QLabel>
@@ -199,17 +200,17 @@ void MainWindow::setupStatusBar() {
 }
 
 void MainWindow::createActions() {
-  m_newAction = new QAction("📄", tr("&New"), this);
+  m_newAction = new QAction(tr("📄 &New"), this);
   m_newAction->setShortcuts(QKeySequence::New);
   m_newAction->setToolTip("New Project (Ctrl+N)");
   connect(m_newAction, &QAction::triggered, this, &MainWindow::newProject);
 
-  m_openAction = new QAction("📂", tr("&Open..."), this);
+  m_openAction = new QAction(tr("📂 &Open..."), this);
   m_openAction->setShortcuts(QKeySequence::Open);
   m_openAction->setToolTip("Open Project (Ctrl+O)");
   connect(m_openAction, &QAction::triggered, this, &MainWindow::openProject);
 
-  m_saveAction = new QAction("💾", tr("&Save"), this);
+  m_saveAction = new QAction(tr("💾 &Save"), this);
   m_saveAction->setShortcuts(QKeySequence::Save);
   m_saveAction->setToolTip("Save Project (Ctrl+S)");
   connect(m_saveAction, &QAction::triggered, this, &MainWindow::saveProject);
@@ -219,25 +220,25 @@ void MainWindow::createActions() {
   connect(m_saveAsAction, &QAction::triggered, this,
           &MainWindow::saveProjectAs);
 
-  m_exportAction = new QAction("🎬", tr("&Export Video..."), this);
+  m_exportAction = new QAction(tr("🎬 &Export Video..."), this);
   m_exportAction->setShortcut(QKeySequence("Ctrl+E"));
   m_exportAction->setToolTip("Export Video (Ctrl+E)");
   connect(m_exportAction, &QAction::triggered, this, &MainWindow::exportVideo);
 
-  m_importAction = new QAction("📥", tr("&Import Media..."), this);
+  m_importAction = new QAction(tr("📥 &Import Media..."), this);
   m_importAction->setShortcut(QKeySequence("Ctrl+I"));
   m_importAction->setToolTip("Import Media (Ctrl+I)");
   connect(m_importAction, &QAction::triggered, this, &MainWindow::importMedia);
 
-  m_undoAction = new QAction("↩️", tr("&Undo"), this);
+  m_undoAction = new QAction(tr("↩️ &Undo"), this);
   m_undoAction->setShortcuts(QKeySequence::Undo);
   connect(m_undoAction, &QAction::triggered, this, &MainWindow::undo);
 
-  m_redoAction = new QAction("↪️", tr("&Redo"), this);
+  m_redoAction = new QAction(tr("↪️ &Redo"), this);
   m_redoAction->setShortcuts(QKeySequence::Redo);
   connect(m_redoAction, &QAction::triggered, this, &MainWindow::redo);
 
-  m_splitAction = new QAction("✂️", tr("Split at Playhead"), this);
+  m_splitAction = new QAction(tr("✂️ Split at Playhead"), this);
   m_splitAction->setShortcut(QKeySequence("Ctrl+B"));
   m_splitAction->setToolTip("Split Clip at Playhead (Ctrl+B)");
   connect(m_splitAction, &QAction::triggered, this,
@@ -259,11 +260,11 @@ void MainWindow::createActions() {
   m_deleteAction->setShortcut(QKeySequence::Delete);
   connect(m_deleteAction, &QAction::triggered, this, &MainWindow::deleteClip);
 
-  m_zoomInAction = new QAction("🔍+", tr("Zoom &In"), this);
+  m_zoomInAction = new QAction(tr("🔍+ Zoom &In"), this);
   m_zoomInAction->setShortcut(QKeySequence::ZoomIn);
   connect(m_zoomInAction, &QAction::triggered, this, &MainWindow::zoomIn);
 
-  m_zoomOutAction = new QAction("🔍-", tr("Zoom &Out"), this);
+  m_zoomOutAction = new QAction(tr("🔍- Zoom &Out"), this);
   m_zoomOutAction->setShortcut(QKeySequence::ZoomOut);
   connect(m_zoomOutAction, &QAction::triggered, this, &MainWindow::zoomOut);
 
@@ -277,7 +278,7 @@ void MainWindow::createActions() {
   m_editModeGroup = new QActionGroup(this);
   m_editModeGroup->setExclusive(true);
 
-  m_selectModeAction = new QAction("🔘", tr("Select"), this);
+  m_selectModeAction = new QAction(tr("🔘 Select"), this);
   m_selectModeAction->setCheckable(true);
   m_selectModeAction->setChecked(true);
   m_selectModeAction->setShortcut(QKeySequence("V"));
@@ -285,28 +286,28 @@ void MainWindow::createActions() {
   connect(m_selectModeAction, &QAction::triggered, this,
           [this]() { setEditMode(EditMode::Select); });
 
-  m_cutModeAction = new QAction("✂️", tr("Cut"), this);
+  m_cutModeAction = new QAction(tr("✂️ Cut"), this);
   m_cutModeAction->setCheckable(true);
   m_cutModeAction->setShortcut(QKeySequence("C"));
   m_editModeGroup->addAction(m_cutModeAction);
   connect(m_cutModeAction, &QAction::triggered, this,
           [this]() { setEditMode(EditMode::Cut); });
 
-  m_trimModeAction = new QAction("📏", tr("Trim"), this);
+  m_trimModeAction = new QAction(tr("📏 Trim"), this);
   m_trimModeAction->setCheckable(true);
   m_trimModeAction->setShortcut(QKeySequence("T"));
   m_editModeGroup->addAction(m_trimModeAction);
   connect(m_trimModeAction, &QAction::triggered, this,
           [this]() { setEditMode(EditMode::Trim); });
 
-  m_splitModeAction = new QAction("🔪", tr("Split"), this);
+  m_splitModeAction = new QAction(tr("🔪 Split"), this);
   m_splitModeAction->setCheckable(true);
   m_splitModeAction->setShortcut(QKeySequence("S"));
   m_editModeGroup->addAction(m_splitModeAction);
   connect(m_splitModeAction, &QAction::triggered, this,
           [this]() { setEditMode(EditMode::Split); });
 
-  m_handModeAction = new QAction("✋", tr("Hand"), this);
+  m_handModeAction = new QAction(tr("✋ Hand"), this);
   m_handModeAction->setCheckable(true);
   m_handModeAction->setShortcut(QKeySequence("H"));
   m_editModeGroup->addAction(m_handModeAction);
@@ -370,6 +371,9 @@ void MainWindow::cutClip() {}
 void MainWindow::copyClip() {}
 void MainWindow::pasteClip() {}
 void MainWindow::deleteClip() {}
+void MainWindow::trimClipStart() {}
+void MainWindow::trimClipEnd() {}
+void MainWindow::resetZoom() { if (m_timeline) m_timeline->resetZoom(); }
 void MainWindow::selectAll() {}
 
 void MainWindow::zoomIn() {
