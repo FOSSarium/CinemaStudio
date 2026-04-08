@@ -46,7 +46,7 @@ void Timeline::setupUI() {
 
   m_zoomLabel = new QLabel("100%", this);
   m_zoomLabel->setStyleSheet(
-      "color: #2196f3; font-size: 11px; padding-right: 8px;");
+      "color: #6366F1; font-size: 11px; padding-right: 8px;");
   infoLayout->addWidget(m_zoomLabel);
 
   layout->addLayout(infoLayout);
@@ -146,7 +146,7 @@ void Timeline::paintEvent(QPaintEvent *) {
   int contentTop = m_rulerHeight + 16; // Account for info bar
 
   // Background
-  painter.fillRect(rect(), QColor("#1a1a1a"));
+  painter.fillRect(rect(), QColor("#151518"));
 
   drawTimeRuler(painter);
   drawTracks(painter);
@@ -156,7 +156,7 @@ void Timeline::paintEvent(QPaintEvent *) {
 void Timeline::drawTimeRuler(QPainter &painter) {
   int rulerTop = m_rulerHeight + 8;
   painter.fillRect(8, rulerTop, width() - 16, m_rulerHeight - 8,
-                   QColor("#2d2d2d"));
+                   QColor("#1A1A1E"));
 
   painter.setPen(QColor("#e0e0e0"));
   painter.setFont(QFont("Monospace", 9));
@@ -211,7 +211,7 @@ void Timeline::drawTracks(QPainter &painter) {
       continue;
 
     // Track background
-    QColor bgColor = (i % 2 == 0) ? QColor("#222222") : QColor("#1e1e1e");
+    QColor bgColor = (i % 2 == 0) ? QColor("#1A1A1E") : QColor("#151518");
     painter.fillRect(8, trackY, width() - 16, m_trackHeight - 2, bgColor);
 
     // Track header
@@ -220,15 +220,15 @@ void Timeline::drawTracks(QPainter &painter) {
     switch (track->getType()) {
     case TrackType::Video:
       trackType = "🎬";
-      trackColor = QColor("#2196f3");
+      trackColor = QColor("#6366F1"); // Movavi-style purple/blue
       break;
     case TrackType::Audio:
       trackType = "🔊";
-      trackColor = QColor("#4caf50");
+      trackColor = QColor("#10B981"); // Modern emerald
       break;
     case TrackType::Text:
       trackType = "📝";
-      trackColor = QColor("#ff9800");
+      trackColor = QColor("#F59E0B"); // Modern amber
       break;
     }
 
@@ -251,7 +251,7 @@ void Timeline::drawTracks(QPainter &painter) {
     }
 
     // Track separator line
-    painter.setPen(QColor("#3d3d3d"));
+    painter.setPen(QColor("#2E2E38"));
     painter.drawLine(8, trackY + m_trackHeight - 2, width() - 8,
                      trackY + m_trackHeight - 2);
 
@@ -267,16 +267,21 @@ void Timeline::drawTracks(QPainter &painter) {
       if (clipX + clipW < 8 || clipX > width() - 8)
         continue;
 
-      // Clip background
+      // Clip background - Use rounded rect directly for fill
       QColor clipColor = trackColor;
+      QColor clipFillColor = clipColor.lighter(120);
+      clipFillColor.setAlpha(200); // Slight transparency
+      
       painter.setRenderHint(QPainter::Antialiasing);
-      painter.fillRect(clipX + 2, trackY + 26, clipW - 4, m_trackHeight - 30,
-                       clipColor.lighter(120));
+      painter.setPen(Qt::NoPen);
+      painter.setBrush(clipFillColor);
+      painter.drawRoundedRect(clipX + 2, trackY + 26, clipW - 4, m_trackHeight - 30, 6, 6);
 
       // Clip border
       painter.setPen(QPen(clipColor, 1));
+      painter.setBrush(Qt::NoBrush);
       painter.drawRoundedRect(clipX + 2, trackY + 26, clipW - 4,
-                              m_trackHeight - 30, 3, 3);
+                              m_trackHeight - 30, 6, 6);
 
       // Clip name
       painter.setPen(QColor("#ffffff"));
@@ -311,14 +316,15 @@ void Timeline::drawPlayhead(QPainter &painter) {
   int trackStartY = m_rulerHeight + 8;
 
   // Playhead line
-  painter.setPen(QPen(QColor("#f44336"), 2));
+  QColor playheadColor = QColor("#F43F5E"); // Rose color
+  painter.setPen(QPen(playheadColor, 2));
   painter.drawLine(x, trackStartY, x, height());
 
-  // Playhead triangle
+  // Playhead marker (Sleek triangle)
   QPolygon triangle;
-  triangle << QPoint(x - 7, trackStartY - 2) << QPoint(x + 7, trackStartY - 2)
-           << QPoint(x, trackStartY + 8);
-  painter.setBrush(QColor("#f44336"));
+  triangle << QPoint(x - 8, trackStartY - 4) << QPoint(x + 8, trackStartY - 4)
+           << QPoint(x, trackStartY + 10);
+  painter.setBrush(playheadColor);
   painter.setPen(Qt::NoPen);
   painter.drawPolygon(triangle);
 }

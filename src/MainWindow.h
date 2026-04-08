@@ -2,10 +2,10 @@
 
 #include "CommonTypes.h"
 #include <QActionGroup>
-#include <QDockWidget>
 #include <QMainWindow>
 #include <QStackedWidget>
 #include <QStatusBar>
+#include <QTabWidget>
 #include <QToolBar>
 #include <memory>
 
@@ -72,7 +72,7 @@ private:
   void setupUI();
   void setupMenus();
   void setupToolbar();
-  void setupDockWidgets();
+  void setupPanels();
   void setupStatusBar();
   void createActions();
   void loadSettings();
@@ -81,6 +81,7 @@ private:
   void setCurrentProject(std::unique_ptr<ProjectFile> project);
 
   // UI Components
+  QTabWidget *m_leftPanelTabs = nullptr;
   VideoPlayer *m_videoPlayer = nullptr;
   Timeline *m_timeline = nullptr;
   MediaLibrary *m_mediaLibrary = nullptr;

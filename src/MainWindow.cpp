@@ -19,6 +19,7 @@
 #include <QMessageBox>
 #include <QSettings>
 #include <QSplitter>
+#include <QTabWidget>
 
 namespace cinemastudio {
 
@@ -54,15 +55,28 @@ void MainWindow::setupUI() {
   mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setSpacing(0);
 
-  // Splitter for video player and timeline
+  // Splitter for top panels and timeline
   QSplitter *mainSplitter = new QSplitter(Qt::Vertical, this);
 
+  // Top horizontal splitter
+  QSplitter *topSplitter = new QSplitter(Qt::Horizontal, mainSplitter);
+
+  // Left panels (tabs)
+  m_leftPanelTabs = new QTabWidget(topSplitter);
+  topSplitter->addWidget(m_leftPanelTabs);
+
   // Video player
-  m_videoPlayer = new VideoPlayer(this);
-  mainSplitter->addWidget(m_videoPlayer);
+  m_videoPlayer = new VideoPlayer(topSplitter);
+  topSplitter->addWidget(m_videoPlayer);
+
+  topSplitter->setStretchFactor(0, 1);
+  topSplitter->setStretchFactor(1, 2);
+  topSplitter->setSizes({width() * 1 / 3, width() * 2 / 3});
+
+  mainSplitter->addWidget(topSplitter);
 
   // Timeline
-  m_timeline = new Timeline(this);
+  m_timeline = new Timeline(mainSplitter);
   mainSplitter->addWidget(m_timeline);
 
   mainSplitter->setStretchFactor(0, 3);
@@ -73,7 +87,7 @@ void MainWindow::setupUI() {
 
   setupMenus();
   setupToolbar();
-  setupDockWidgets();
+  setupPanels();
   setupStatusBar();
 }
 
@@ -129,6 +143,7 @@ void MainWindow::setupMenus() {
 
 void MainWindow::setupToolbar() {
   QToolBar *toolbar = addToolBar("Main");
+  toolbar->setObjectName("MainToolbar");
   toolbar->setMovable(false);
   toolbar->setIconSize(QSize(20, 20));
   toolbar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
@@ -144,8 +159,8 @@ void MainWindow::setupToolbar() {
   toolbar->addAction(m_importAction);
   toolbar->addAction(m_exportAction);
 
-  // Edit mode toolbar
   QToolBar *editToolbar = addToolBar("Edit Tools");
+  editToolbar->setObjectName("EditToolbar");
   editToolbar->setMovable(false);
   editToolbar->setIconSize(QSize(20, 20));
   editToolbar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
@@ -157,41 +172,22 @@ void MainWindow::setupToolbar() {
   editToolbar->addAction(m_handModeAction);
 }
 
-void MainWindow::setupDockWidgets() {
-  // Media Library (left)
+void MainWindow::setupPanels() {
+  // Media Library
   m_mediaLibrary = new MediaLibrary(this);
-  QDockWidget *mediaDock = new QDockWidget("  Media Library", this);
-  mediaDock->setFeatures(QDockWidget::DockWidgetMovable |
-                         QDockWidget::DockWidgetFloatable);
-  mediaDock->setWidget(m_mediaLibrary);
-  addDockWidget(Qt::LeftDockWidgetArea, mediaDock);
+  m_leftPanelTabs->addTab(m_mediaLibrary, "Media Library");
 
-  // Effects Panel (right)
+  // Effects Panel
   m_effectsPanel = new EffectsPanel(this);
-  QDockWidget *effectsDock = new QDockWidget("  Effects", this);
-  effectsDock->setFeatures(QDockWidget::DockWidgetMovable |
-                           QDockWidget::DockWidgetFloatable);
-  effectsDock->setWidget(m_effectsPanel);
-  addDockWidget(Qt::RightDockWidgetArea, effectsDock);
+  m_leftPanelTabs->addTab(m_effectsPanel, "Effects");
 
-  // Properties Panel (right)
+  // Properties Panel
   m_propertiesPanel = new PropertiesPanel(this);
-  QDockWidget *propsDock = new QDockWidget("  Properties", this);
-  propsDock->setFeatures(QDockWidget::DockWidgetMovable |
-                         QDockWidget::DockWidgetFloatable);
-  propsDock->setWidget(m_propertiesPanel);
-  addDockWidget(Qt::RightDockWidgetArea, propsDock);
-  tabifyDockWidget(effectsDock, propsDock);
-  effectsDock->raise();
+  m_leftPanelTabs->addTab(m_propertiesPanel, "Properties");
 
-  // Audio Mixer (bottom)
+  // Audio Mixer
   m_audioMixer = new AudioMixer(this);
-  QDockWidget *audioDock = new QDockWidget("  Audio Mixer", this);
-  audioDock->setFeatures(QDockWidget::DockWidgetMovable |
-                         QDockWidget::DockWidgetFloatable);
-  audioDock->setWidget(m_audioMixer);
-  audioDock->setMinimumHeight(120);
-  addDockWidget(Qt::BottomDockWidgetArea, audioDock);
+  m_leftPanelTabs->addTab(m_audioMixer, "Audio Mixer");
 }
 
 void MainWindow::setupStatusBar() {

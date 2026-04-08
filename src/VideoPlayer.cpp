@@ -255,23 +255,24 @@ void VideoPlayer::updateFrame() {
 }
 
 void VideoPlayer::paintEvent(QPaintEvent *) {
-  QPainter painter(m_videoCanvas);
+  QPainter painter(this);
   painter.setRenderHint(QPainter::SmoothPixmapTransform);
 
+  QRect targetRect = m_videoCanvas->geometry();
+
   if (m_currentFrame.isNull() || m_currentFrame.width() == 0) {
-    painter.fillRect(m_videoCanvas->rect(), QColor("#0a0a0a"));
+    painter.fillRect(targetRect, QColor("#000000"));
     painter.setPen(QColor("#555555"));
     QFont font = painter.font();
-    font.setPointSize(18);
+    font.setPointSize(16);
     painter.setFont(font);
-    painter.drawText(m_videoCanvas->rect(), Qt::AlignCenter,
+    painter.drawText(targetRect, Qt::AlignCenter,
                      "No Media\nImport video files to begin editing");
   } else {
-    QRect drawRect = m_videoCanvas->rect();
-    QImage scaled = m_currentFrame.scaled(drawRect.size(), Qt::KeepAspectRatio,
+    QImage scaled = m_currentFrame.scaled(targetRect.size(), Qt::KeepAspectRatio,
                                           Qt::SmoothTransformation);
     QRect imageRect = scaled.rect();
-    imageRect.moveCenter(drawRect.center());
+    imageRect.moveCenter(targetRect.center());
     painter.drawImage(imageRect, scaled);
   }
   drawOverlay(painter);
@@ -280,12 +281,13 @@ void VideoPlayer::paintEvent(QPaintEvent *) {
 void VideoPlayer::drawOverlay(QPainter &painter) {
   // Semi-transparent overlay when not playing
   if (!m_isPlaying && m_duration > 0) {
-    painter.fillRect(m_videoCanvas->rect(), QColor(0, 0, 0, 80));
+    QRect targetRect = m_videoCanvas->geometry();
+    painter.fillRect(targetRect, QColor(0, 0, 0, 80));
     painter.setPen(Qt::white);
     QFont font = painter.font();
     font.setPointSize(36);
     painter.setFont(font);
-    painter.drawText(m_videoCanvas->rect(), Qt::AlignCenter, "▶");
+    painter.drawText(targetRect, Qt::AlignCenter, "▶");
   }
 }
 
