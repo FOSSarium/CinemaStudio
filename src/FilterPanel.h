@@ -1,5 +1,7 @@
 #pragma once
 #include <QWidget>
 namespace cinemastudio {
-class FilterPanel : public QWidget { 
-public: FilterPanel(QWidget* parent = nullptr); }; }
+class FilterPanel : public QWidget {
+public:
+    explicit FilterPanel(QWidget* parent = nullptr);
+}; }

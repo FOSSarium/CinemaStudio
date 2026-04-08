@@ -1,6 +1,8 @@
 #pragma once
 #include <QWidget>
 namespace cinemastudio { class ProjectFile;
-class AudioMixer : public QWidget { 
-public: AudioMixer(QWidget* parent = nullptr);
-void setProject(ProjectFile* project); }; }
+class AudioMixer : public QWidget {
+public:
+    explicit AudioMixer(QWidget* parent = nullptr);
+    void setProject(ProjectFile* project);
+}; }

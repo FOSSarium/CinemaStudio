@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CommonTypes.h"
+#include <QLabel>
 #include <QScrollBar>
 #include <QWidget>
 #include <memory>
@@ -16,7 +17,7 @@ class Timeline : public QWidget {
   Q_OBJECT
 
 public:
-  Timeline(QWidget *parent = nullptr);
+  explicit Timeline(QWidget *parent = nullptr);
   ~Timeline();
 
   void setProject(ProjectFile *project);
@@ -37,6 +38,7 @@ public:
 signals:
   void timeChanged(double time);
   void clipSelected(const QString &clipId);
+  void playheadMoved(double time);
 
 protected:
   void paintEvent(QPaintEvent *event) override;
@@ -47,31 +49,27 @@ protected:
   void resizeEvent(QResizeEvent *event) override;
 
 private:
-  void drawTimeline(QPainter &painter);
+  void setupUI();
+  void drawTimeRuler(QPainter &painter);
   void drawTracks(QPainter &painter);
   void drawPlayhead(QPainter &painter);
-  void drawTimeRuler(QPainter &painter);
   void updateScrollbars();
-  TimelineTrack *getTrackAtY(int y) const;
-  TimelineClip *getClipAtPosition(double time, int trackIndex);
 
   ProjectFile *m_project = nullptr;
   EditMode m_editMode = EditMode::Select;
 
-  std::vector<std::unique_ptr<TimelineTrack>> m_trackWidgets;
-
   double m_playheadPosition = 0.0;
   double m_zoom = 50.0; // pixels per second
-  int m_trackHeight = 80;
-  int m_rulerHeight = 30;
+  int m_trackHeight = 60;
+  int m_rulerHeight = 32;
 
   bool m_draggingPlayhead = false;
-  bool m_draggingClip = false;
-  QString m_draggedClipId;
-  double m_dragStartTime = 0.0;
 
+  // UI
   QScrollBar *m_hScrollbar = nullptr;
   QScrollBar *m_vScrollbar = nullptr;
+  QLabel *m_zoomLabel = nullptr;
+  QLabel *m_infoLabel = nullptr;
 };
 
 } // namespace cinemastudio
